@@ -2,6 +2,7 @@
 
 
 #include "ShooterCharacter.h"
+#include "Gun.h"
 
 // Sets default values
 AShooterCharacter::AShooterCharacter()
@@ -23,6 +24,13 @@ void AShooterCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if(GunClass)
+	{
+		Gun = GetWorld()->SpawnActor<AGun>(GunClass);
+		Gun->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("WeaponSocket"));
+		Gun->SetOwner(this);
+		GetMesh()->HideBoneByName(TEXT("weapon_r"), EPhysBodyOp::PBO_None);
+	}
 }
 
 // Called to bind functionality to input
