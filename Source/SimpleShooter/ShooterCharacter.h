@@ -33,6 +33,8 @@ private:
 	void Turn(float AxisValue);
 	void LookUpRate(float AxisValue);
 	void TurnRate(float AxisValue);
+	void StartFire();
+	void StopFire();
 
 	UPROPERTY(EditAnywhere)
 	float RotationRate = 10.f;

@@ -45,7 +45,10 @@ void AShooterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 	PlayerInputComponent->BindAxis(TEXT("Turn"), this, &AShooterCharacter::Turn);
 	PlayerInputComponent->BindAxis(TEXT("LookUpRate"), this, &AShooterCharacter::LookUpRate);
 	PlayerInputComponent->BindAxis(TEXT("TurnRate"), this, &AShooterCharacter::TurnRate);
+
 	PlayerInputComponent->BindAction(TEXT("Jump"), EInputEvent::IE_Pressed, this, &ACharacter::Jump);
+	PlayerInputComponent->BindAction(TEXT("Fire"), EInputEvent::IE_Pressed, this, &AShooterCharacter::StartFire);
+	PlayerInputComponent->BindAction(TEXT("Fire"), EInputEvent::IE_Released, this, &AShooterCharacter::StopFire);
 }
 
 void AShooterCharacter::MoveForward(float AxisValue)
@@ -71,6 +74,19 @@ void AShooterCharacter::LookUpRate(float AxisValue)
 void AShooterCharacter::TurnRate(float AxisValue)
 {
 	AddControllerYawInput(AxisValue * RotationRate * GetWorld()->GetDeltaSeconds());
+}
+
+void AShooterCharacter::StartFire()
+{
+	if(Gun)
+	{
+		Gun->PullTrigger();
+	}
+}
+
+void AShooterCharacter::StopFire()
+{
+	UE_LOG(LogTemp, Display, TEXT("StopFire"));
 }
 
 // void AShooterCharacter::LookUp(float AxisValue)
