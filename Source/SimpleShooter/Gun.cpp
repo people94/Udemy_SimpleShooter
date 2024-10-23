@@ -4,6 +4,8 @@
 #include "Gun.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "DrawDebugHelpers.h"
+#include "Engine/DamageEvents.h"
 
 // Sets default values
 AGun::AGun()
@@ -24,6 +26,34 @@ void AGun::PullTrigger()
 	if(MuzzleFlash)
 	{
 		UGameplayStatics::SpawnEmitterAttached(MuzzleFlash, Mesh, TEXT("MuzzleFlashSocket"));
+	}
+
+	APawn* OwnerPawn = Cast<APawn>(GetOwner());
+	if(OwnerPawn == nullptr) return;
+	AController* OwnerController = OwnerPawn->GetController();
+	if(OwnerController == nullptr) return;
+	FVector ViewLocation(0.0f);
+	FRotator ViewRotation(0.0f);
+	OwnerController->GetPlayerViewPoint(ViewLocation, ViewRotation);
+
+	// Rotation.Vector() 하면 해당 회전으로의 방향벡터 얻을 수 있음.
+	FVector End = ViewLocation + ViewRotation.Vector() * MaxRange;
+	// TODO: LineTrace
+	FHitResult Hit;
+	bool bSuccess = GetWorld()->LineTraceSingleByChannel(Hit, ViewLocation, End, ECollisionChannel::ECC_GameTraceChannel1);
+	if(bSuccess == true)
+	{
+		FVector ShotDirection = -ViewRotation.Vector();	// 총이 발사된 방향으로의 벡터, Vector.Rotation() 하면 해당 벡터의 회전을 얻을 수 있음.
+		if(ImpactEffect != nullptr)
+		{
+			UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ImpactEffect, Hit.Location, ShotDirection.Rotation());
+		}
+		AActor* HitActor = Hit.GetActor();
+		if(HitActor != nullptr)
+		{
+			FPointDamageEvent DamageEvent(Damage, Hit, ShotDirection, nullptr);
+			Hit.GetActor()->TakeDamage(Damage, DamageEvent, GetOwner()->GetInstigatorController(), GetOwner());
+		}
 	}
 }
 
