@@ -31,6 +31,9 @@ public:
 	UFUNCTION(BlueprintPure)
 	bool IsDead() const;
 
+	void StartFire();
+	void StopFire();
+
 private:
 	void MoveForward(float AxisValue);
 	//void LookUp(float AxisValue);
@@ -38,8 +41,6 @@ private:
 	void Turn(float AxisValue);
 	void LookUpRate(float AxisValue);
 	void TurnRate(float AxisValue);
-	void StartFire();
-	void StopFire();
 
 	UPROPERTY(EditAnywhere)
 	float RotationRate = 10.0f;

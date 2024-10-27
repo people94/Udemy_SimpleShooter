@@ -20,6 +20,10 @@ public:
 	virtual void Tick( float DeltaSeconds ) override;
 
 private:
+	// UPROPERTY(EditAnywhere)
+	// float AcceptanceRadius = 200.0f;
+
 	UPROPERTY(EditAnywhere)
-	float AcceptanceRadius = 200.0f;
+	class UBehaviorTree* AIBehavior;
+	
 };
