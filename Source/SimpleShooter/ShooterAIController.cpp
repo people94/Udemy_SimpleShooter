@@ -27,24 +27,24 @@ void AShooterAIController::BeginPlay()
 void AShooterAIController::Tick(float DeltaSeconds)
 {
     Super::Tick(DeltaSeconds);
-     APawn* PlayerPawn = UGameplayStatics::GetPlayerPawn(GetWorld(), 0);
+//     APawn* PlayerPawn = UGameplayStatics::GetPlayerPawn(GetWorld(), 0);
 
-//    // MoveToActor(PlayerPawn, 200); // 얘는 호출할때만 이동하는 거라서 Tick에서 호출해야함
+// //    // MoveToActor(PlayerPawn, 200); // 얘는 호출할때만 이동하는 거라서 Tick에서 호출해야함
 
-     if(LineOfSightTo(PlayerPawn))
-     {
-//         SetFocus(PlayerPawn);
-//         MoveToActor(PlayerPawn, AcceptanceRadius);
-        // Setting PlayerLocation
-        GetBlackboardComponent()->SetValueAsVector(TEXT("PlayerLocation"), PlayerPawn->GetActorLocation());
-        // Setting lastknown
-        GetBlackboardComponent()->SetValueAsVector(TEXT("LastKnownPlayerLocation"), PlayerPawn->GetActorLocation());
-     }
-     else
-     {
-//         ClearFocus(EAIFocusPriority::Gameplay);
-//         StopMovement();
-        // clear PlayerLocation
-        GetBlackboardComponent()->ClearValue(TEXT("PlayerLocation"));
-     }
+//      if(LineOfSightTo(PlayerPawn))
+//      {
+// //         SetFocus(PlayerPawn);
+// //         MoveToActor(PlayerPawn, AcceptanceRadius);
+//         // Setting PlayerLocation
+//         GetBlackboardComponent()->SetValueAsVector(TEXT("PlayerLocation"), PlayerPawn->GetActorLocation());
+//         // Setting lastknown
+//         GetBlackboardComponent()->SetValueAsVector(TEXT("LastKnownPlayerLocation"), PlayerPawn->GetActorLocation());
+//      }
+//      else
+//      {
+// //         ClearFocus(EAIFocusPriority::Gameplay);
+// //         StopMovement();
+//         // clear PlayerLocation
+//         GetBlackboardComponent()->ClearValue(TEXT("PlayerLocation"));
+//      }
 }

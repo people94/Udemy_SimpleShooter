@@ -40,7 +40,10 @@ void AGun::PullTrigger()
 	FVector End = ViewLocation + ViewRotation.Vector() * MaxRange;
 	// TODO: LineTrace
 	FHitResult Hit;
-	bool bSuccess = GetWorld()->LineTraceSingleByChannel(Hit, ViewLocation, End, ECollisionChannel::ECC_GameTraceChannel1);
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActor(this);
+	Params.AddIgnoredActor(OwnerPawn);
+	bool bSuccess = GetWorld()->LineTraceSingleByChannel(Hit, ViewLocation, End, ECollisionChannel::ECC_GameTraceChannel1, Params);
 	if(bSuccess == true)
 	{
 		FVector ShotDirection = -ViewRotation.Vector();	// 총이 발사된 방향으로의 벡터, Vector.Rotation() 하면 해당 벡터의 회전을 얻을 수 있음.
