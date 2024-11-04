@@ -28,34 +28,30 @@ void AGun::PullTrigger()
 		UGameplayStatics::SpawnEmitterAttached(MuzzleFlash, Mesh, TEXT("MuzzleFlashSocket"));
 	}
 
-	APawn* OwnerPawn = Cast<APawn>(GetOwner());
-	if(OwnerPawn == nullptr) return;
-	AController* OwnerController = OwnerPawn->GetController();
-	if(OwnerController == nullptr) return;
-	FVector ViewLocation(0.0f);
-	FRotator ViewRotation(0.0f);
-	OwnerController->GetPlayerViewPoint(ViewLocation, ViewRotation);
+	if(MuzzleSound)
+	{
+		UGameplayStatics::SpawnSoundAttached(MuzzleSound, Mesh, TEXT("MuzzleFlashSocket"));
+	}
 
-	// Rotation.Vector() 하면 해당 회전으로의 방향벡터 얻을 수 있음.
-	FVector End = ViewLocation + ViewRotation.Vector() * MaxRange;
-	// TODO: LineTrace
 	FHitResult Hit;
-	FCollisionQueryParams Params;
-	Params.AddIgnoredActor(this);
-	Params.AddIgnoredActor(OwnerPawn);
-	bool bSuccess = GetWorld()->LineTraceSingleByChannel(Hit, ViewLocation, End, ECollisionChannel::ECC_GameTraceChannel1, Params);
+	FVector ShotDirection;
+	bool bSuccess = GunTrace(Hit, ShotDirection);
 	if(bSuccess == true)
 	{
-		FVector ShotDirection = -ViewRotation.Vector();	// 총이 발사된 방향으로의 벡터, Vector.Rotation() 하면 해당 벡터의 회전을 얻을 수 있음.
 		if(ImpactEffect != nullptr)
 		{
 			UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ImpactEffect, Hit.Location, ShotDirection.Rotation());
+		}
+		if(ImpactSound != nullptr)
+		{
+			UGameplayStatics::PlaySoundAtLocation(GetWorld(), ImpactSound, Hit.Location);
 		}
 		AActor* HitActor = Hit.GetActor();
 		if(HitActor != nullptr)
 		{
 			FPointDamageEvent DamageEvent(Damage, Hit, ShotDirection, nullptr);
-			Hit.GetActor()->TakeDamage(Damage, DamageEvent, GetOwner()->GetInstigatorController(), GetOwner());
+			AController* OwnerController = GetOwnerController();
+			Hit.GetActor()->TakeDamage(Damage, DamageEvent, OwnerController, GetOwner());
 		}
 	}
 }
@@ -72,5 +68,32 @@ void AGun::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+}
+
+bool AGun::GunTrace(FHitResult& Hit, FVector& ShotDirection)
+{
+	AController* OwnerController = GetOwnerController();
+	if (OwnerController == nullptr)
+		return false;
+
+	FVector ViewLocation(0.0f);
+	FRotator ViewRotation(0.0f);
+	OwnerController->GetPlayerViewPoint(ViewLocation, ViewRotation);
+	ShotDirection = -ViewRotation.Vector();	// 총이 발사된 방향으로의 벡터, Vector.Rotation() 하면 해당 벡터의 회전을 얻을 수 있음.
+
+	// Rotation.Vector() 하면 해당 회전으로의 방향벡터 얻을 수 있음.
+	FVector End = ViewLocation + ViewRotation.Vector() * MaxRange;
+	// TODO: LineTrace
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActor(this);
+	Params.AddIgnoredActor(GetOwner());
+	return GetWorld()->LineTraceSingleByChannel(Hit, ViewLocation, End, ECollisionChannel::ECC_GameTraceChannel1, Params);
+}
+
+AController* AGun::GetOwnerController() const
+{
+	APawn* OwnerPawn = Cast<APawn>(GetOwner());
+	if(OwnerPawn == nullptr) return nullptr;
+	return OwnerPawn->GetController();
 }
 

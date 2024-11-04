@@ -4,6 +4,7 @@
 #include "ShooterAIController.h"
 #include "Kismet/GameplayStatics.h"
 #include "BehaviorTree/BlackboardComponent.h"
+#include "ShooterCharacter.h"
 
 
 void AShooterAIController::BeginPlay()
@@ -47,4 +48,15 @@ void AShooterAIController::Tick(float DeltaSeconds)
 //         // clear PlayerLocation
 //         GetBlackboardComponent()->ClearValue(TEXT("PlayerLocation"));
 //      }
+}
+
+bool AShooterAIController::IsDead() const
+{
+    AShooterCharacter* ControlledCharacter = Cast<AShooterCharacter>(GetPawn());
+    if(ControlledCharacter != nullptr)
+    {
+        return ControlledCharacter->IsDead();
+    }
+
+    return true;    // 없다 = 캐릭터가 이미 죽어서 소유중인 폰이없다.
 }
